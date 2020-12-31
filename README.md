@@ -1,4 +1,5 @@
-# ts-stable - STABLE programming language in Typescript
+# ts-stable 
+## STABLE programming language in Typescript
 
 STABLE is an extremely minimalistic "Forth-like" (but not Forth) language by Sandor Sneider.
 Originally in C, I have ported it to Typescript to explore what can be done with the one of the world's smallest programming lanaguages.
