@@ -10,7 +10,6 @@ install:
   - yarn install
 after_success:
   - yarn build
-  - yarn lh -- --score=96 https://jhlagado.github.io/ts-stable/index.html
 cache:
   directories:
     - node_modules
