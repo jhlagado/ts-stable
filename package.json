@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "A Forth written in Typescript",
   "scripts": {
-    "start": "parcel src/index.html",
+    "start": "parcel build src/index.html && parcel src/index.html",
     "build": "parcel build src/index.html  --public-url .",
     "lint": "eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
     "test": "npm run lint && jest --coverage"

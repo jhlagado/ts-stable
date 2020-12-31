@@ -358,6 +358,7 @@ export const interpret = async (text: string): Promise<void> => {
         if (code === COBRACE) restore = true;
         seti8(here++, code!);
     }
+    if (oldHere === here) return;
     ip = oldHere;
     await new Promise<void>((resolve) => {
         (function loop(restart = false) {
