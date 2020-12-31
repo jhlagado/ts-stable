@@ -5,6 +5,7 @@ export const MEM_START = 0;
 
 export const DEBUG = false;
 
+export const NULL = 0;
 export const TRUE = -1;
 export const FALSE = 0;
 

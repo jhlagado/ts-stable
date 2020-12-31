@@ -2,7 +2,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { DATA_SIZE, FALSE, START_DATA, START_PROG, TRUE } from './constants';
+import { DATA_SIZE, FALSE, NULL, START_DATA, START_PROG, TRUE } from './constants';
 import { getch, getquery, putch, putStr } from './io';
 import { getf32, geti32, geti8, setf32, seti32, seti8, updf32, updi32 } from './memory';
 
@@ -333,7 +333,7 @@ export const interpReset = (): void => {
 
 const interpTick = (restart?: boolean): boolean => {
     let restarting = restart;
-    while (run && ip <= here) {
+    while (run && ip < here) {
         if (restarting) ip--;
         token = geti8(ip);
         console.log(token);
@@ -358,14 +358,14 @@ export const interpret = async (text: string): Promise<void> => {
         if (code === COBRACE) restore = true;
         seti8(here++, code!);
     }
-    if (oldHere === here) return;
+    seti8(here++, NULL);
     ip = oldHere;
     await new Promise<void>((resolve) => {
         (function loop(restart = false) {
             const result = interpTick(restart);
-            if (run && ip <= here) setTimeout(() => loop(result));
+            if (run && ip < here) setTimeout(() => loop(result));
             else resolve();
         })();
     });
-    // if (restore && ip > here) here = oldHere;
+    if (restore) here = oldHere;
 };
