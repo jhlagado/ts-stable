@@ -7,7 +7,7 @@ Originally in C, I have ported it to Typescript to explore what can be done with
 
 STABLE stands for STAck Bytecode Language & Engine and the [original implementation](st.c) is only around 233 lines of formatted C code (and much smaller if all the whitespace is removed).
 
-Go here to see [a fully working version of STABLE](https://jhlagado.github.io/ts-stable/)
+Go here to see [a fully working version of STABLE](https://jhlagado.github.io/ts-stable/) in your browser.
 
 ## Glossary
 
