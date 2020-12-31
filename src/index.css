@@ -17,7 +17,7 @@ body {
     display: table-cell;
     vertical-align: bottom;
     height: 100%;
- }
+}
 
 .log {
     padding-left: 10px;
@@ -35,26 +35,25 @@ body {
 #input {
     padding-left: 10px;
     padding-right: 10px;
+    display: flex;
+    flex-direction: row;
 }
 
 #input p {
     color: #00e676;
     display: inline-block;
     font-family: 'Source Code Pro', monospace;
-    padding-right: .4em;
+    padding-right: 0.4em;
     margin: 0;
+    flex-shrink: 1;
 }
 
-#input input {
-    width: 85%;
-    display: inline-block;
-}
-
-input[type="command"] {
+#input input[type='command'] {
     background-color: black;
     border: 0;
     color: #00e676;
     font-family: 'Source Code Pro', monospace;
     font-size: 16px;
     outline: 0;
+    flex-grow: 1;
 }

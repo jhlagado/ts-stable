@@ -367,5 +367,5 @@ export const interpret = async (text: string): Promise<void> => {
             else resolve();
         })();
     });
-    if (restore && ip > here) here = oldHere;
+    // if (restore && ip > here) here = oldHere;
 };

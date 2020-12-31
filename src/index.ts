@@ -34,8 +34,11 @@ inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
         historyIndex = 0;
         (inputSource as any).value = '';
         appendInputBuffer(text);
+        const oldPrompt = getPrompt();
         await interpret(text);
-        log(`${getPrompt()} ${text}`);
+        log(`${oldPrompt} ${text}`);
+        const prompt = document.getElementById('prompt');
+        prompt!.innerText = getPrompt();
     }
 });
 
@@ -51,4 +54,5 @@ loop();
 setOutputBuffer('');
 log('STABLE');
 interpReset();
-log(`${getPrompt()}`);
+const prompt = document.getElementById('prompt');
+prompt!.innerText = getPrompt();
