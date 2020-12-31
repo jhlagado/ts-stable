@@ -1,0 +1,39 @@
+{
+  "testEnvironment": "node",
+  "moduleFileExtensions": [
+    "ts",
+    "tsx",
+    "js",
+    "jsx",
+    "json",
+    "node"
+  ],
+  "transform": {
+    "^.+\\.tsx?$": "ts-jest"
+  },
+  "testRegex": "^.*.test.(ts|tsx)$",
+  "collectCoverageFrom": [
+    "src/**/*.{ts,tsx}",
+    "!src/icons/**/*.{ts,tsx}",
+    "!**/node_modules/**",
+    "!**/coverage/**",
+    "!src/index.tsx"
+  ],
+  "setupFiles": [
+    "<rootDir>/testSetup.js"
+  ],
+  "moduleNameMapper": {
+    "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/empty.js",
+    "\\.(css|less)$": "<rootDir>/empty.js",
+    "\\.md$": "<rootDir>/empty-md.js"
+  },
+  "testURL": "https://localhost/",
+  "coverageThreshold": {
+    "global": {
+      "statements": 80,
+      "branches": 80,
+      "functions": 80,
+      "lines": 80
+    }
+  }
+}
