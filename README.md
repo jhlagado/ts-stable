@@ -5,7 +5,7 @@
 STABLE is an extremely minimalistic "Forth-like" (but not Forth) language by Sandor Schneider.
 Originally in C, I have ported it to Typescript to explore what can be done with the one of the world's smallest viable programming languages.
 
-STABLE stands for STAck Bytecode Language & Engine and the [original implementation](st.c) is only about 233 lines of formatted C code and much shorter if all the whitespace is removed.
+STABLE stands for STAck Bytecode Language & Engine and the [original implementation](examples/st.c) is only about 233 lines of formatted C code and much shorter if all the whitespace is removed.
 
 Go here to see [a fully working version of STABLE](https://jhlagado.github.io/ts-stable/) in your browser.
 
