@@ -14,12 +14,12 @@ const EOF = 5;
 const CZERO = '0'.charCodeAt(0);
 const CNINE = '9'.charCodeAt(0);
 const CQUOTE = '"'.charCodeAt(0);
-// const CAPOS = "'".charCodeAt(0);
-// const CDOT = '.'.charCodeAt(0);
-// const CPLUS = '+'.charCodeAt(0);
-// const CMINUS = '-'.charCodeAt(0);
-// const CSTAR = '*'.charCodeAt(0);
-// const CSLASH = '/'.charCodeAt(0);
+const CAPOS = "'".charCodeAt(0);
+const CDOT = '.'.charCodeAt(0);
+const CPLUS = '+'.charCodeAt(0);
+const CMINUS = '-'.charCodeAt(0);
+const CSTAR = '*'.charCodeAt(0);
+const CSLASH = '/'.charCodeAt(0);
 const CCPAREN = ')'.charCodeAt(0);
 const CCBRACK = ']'.charCodeAt(0);
 const COBRACE = '{'.charCodeAt(0);
@@ -87,29 +87,29 @@ const AND = () => {
     sp--;
 };
 
-const EXTERNAL = () => {
-    // ip++;
-    // token = geti8(ip);
-    // if (token === CAPOS) {
-    //     setf32(sp, geti32(sp));
-    // } else if (token === CZERO) {
-    //     seti32(sp, getf32(sp));
-    // } else if (token === CDOT) {
-    //     putStr(getf32(sp).toString());
-    //     sp--;
-    // } else if (token === CPLUS) {
-    //     updf32(sp - 1, (val) => val + getf32(sp));
-    //     sp--;
-    // } else if (token === CMINUS) {
-    //     updf32(sp - 1, (val) => val - getf32(sp));
-    //     sp--;
-    // } else if (token === CSTAR) {
-    //     updf32(sp - 1, (val) => val * getf32(sp));
-    //     sp--;
-    // } else if (token === CSLASH) {
-    //     updf32(sp - 1, (val) => val / getf32(sp));
-    //     sp--;
-    // }
+const FLOAT = () => {
+    ip++;
+    token = geti8(ip);
+    if (token === CAPOS) {
+        setf32(sp, geti32(sp));
+    } else if (token === CZERO) {
+        seti32(sp, getf32(sp));
+    } else if (token === CDOT) {
+        putStr(getf32(sp).toString());
+        sp--;
+    } else if (token === CPLUS) {
+        updf32(sp - 1, (val) => val + getf32(sp));
+        sp--;
+    } else if (token === CMINUS) {
+        updf32(sp - 1, (val) => val - getf32(sp));
+        sp--;
+    } else if (token === CSTAR) {
+        updf32(sp - 1, (val) => val * getf32(sp));
+        sp--;
+    } else if (token === CSLASH) {
+        updf32(sp - 1, (val) => val / getf32(sp));
+        sp--;
+    }
 };
 
 const IF = () => {
@@ -262,7 +262,7 @@ const KEY = () => {
     seti32(sp, ch);
 };
 
-const CHAR = () => {
+const EXTERNAL = () => {
     ip++;
     while (geti8(ip) !== CTICK) {
         ex += String.fromCharCode(geti8(ip));
@@ -299,13 +299,13 @@ const q = [
     NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
-    NOP, NOP, NOP, STORE, PRINT, DUP, SWAP, MOD, AND, EXTERNAL, 
+    NOP, NOP, NOP, STORE, PRINT, DUP, SWAP, MOD, AND, FLOAT, 
     IF, NOP, MUL, ADD, EMIT, SUB, DOT, DIV, DIGIT, DIGIT, 
     DIGIT, DIGIT, DIGIT, DIGIT, DIGIT, DIGIT, DIGIT, DIGIT, RSET, RGET, 
     LESS, EQUAL, GREATER, FETCH, OVER, CALL, CALL, CALL, CALL, CALL, 
     CALL, CALL, CALL, CALL, CALL, CALL, CALL, CALL, CALL, CALL, 
     CALL, CALL, CALL, CALL, CALL, CALL, CALL, CALL, CALL, CALL, 
-    CALL, LOOP, DROP, ENDLOOP, KEY, NEGATE, CHAR, REG, REG, REG, 
+    CALL, LOOP, DROP, ENDLOOP, KEY, NEGATE, EXTERNAL, REG, REG, REG, 
     REG, REG, REG, REG, REG, REG, REG, REG, REG, REG, 
     REG, REG, REG, REG, REG, REG, REG, REG, REG, REG, 
     REG, REG, REG, DEF, OR, ENDDEF, NOT, 
