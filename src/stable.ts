@@ -2,164 +2,176 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-import { DATA_SIZE, FALSE, NULL, START_DATA, START_PROG, TRUE } from './constants';
+import {
+    CAPOS,
+    CCBRACK,
+    CCPAREN,
+    CDOT,
+    CLOWERA,
+    CLOWERZ,
+    CMINUS,
+    CNINE,
+    COBRACE,
+    CPLUS,
+    CQUOTE,
+    CSLASH,
+    CSTAR,
+    CTICK,
+    CZERO,
+    DATA_SIZE,
+    FALSE,
+    NULL,
+    START_DATA,
+    START_PROG,
+    TRUE,
+} from './constants';
 import { getch, getquery, putch, putStr } from './io';
-import { getf32, geti32, geti8, setf32, seti32, seti8, updf32, updi32 } from './memory';
+import { geti, getb, seti, setb } from './memory';
+import { getReg, selectReg, setReg } from './registers';
+import {
+    pop,
+    push,
+    peek2,
+    poke2,
+    peek,
+    poke,
+    pokef,
+    peekf,
+    popf,
+    pokef2,
+    peekf2,
+    sp,
+    rp,
+    rpush,
+    rpop,
+    setStacks,
+} from './stacks';
 
-let run;
-let here;
+let ip = 0;
+
+let run: boolean;
+let here: number;
 
 const EOF = 5;
 
-const CZERO = '0'.charCodeAt(0);
-const CNINE = '9'.charCodeAt(0);
-const CQUOTE = '"'.charCodeAt(0);
-const CAPOS = "'".charCodeAt(0);
-const CDOT = '.'.charCodeAt(0);
-const CPLUS = '+'.charCodeAt(0);
-const CMINUS = '-'.charCodeAt(0);
-const CSTAR = '*'.charCodeAt(0);
-const CSLASH = '/'.charCodeAt(0);
-const CCPAREN = ')'.charCodeAt(0);
-const CCBRACK = ']'.charCodeAt(0);
-const COBRACE = '{'.charCodeAt(0);
-const CCBRACE = '}'.charCodeAt(0);
-const CLOWERA = 'a'.charCodeAt(0);
-const CLOWERZ = 'z'.charCodeAt(0);
-const CTICK = '`'.charCodeAt(0);
-
 let ex = '';
-
 let token = 0;
 let incMode = false;
-let selectedReg = 0;
-let rp = 0;
-let ip = 0;
-let sp = 0;
 
-const NOP = () => {
-    // console.log('nop');
-};
+const NOP = () => {};
 
 const STORE = () => {
-    seti32(geti32(selectedReg), geti32(sp));
-    sp--;
+    seti(getReg(), pop());
 };
 
 const REG = () => {
     incMode = true;
-    selectedReg = token;
+    selectReg(token);
 };
 
 const PRINT = () => {
     ip++;
-    token = geti8(ip);
+    token = getb(ip);
     while (token !== CQUOTE) {
         putch(token);
         ip++;
-        token = geti8(ip);
+        token = getb(ip);
     }
 };
 
 const DUP = () => {
-    sp++;
-    seti32(sp, geti32(sp - 1));
+    push(peek());
 };
 
 const MUL = () => {
-    updi32(sp - 1, (val) => val * geti32(sp));
-    sp--;
+    const val = pop();
+    poke(peek() * val);
 };
 
 const SWAP = () => {
-    const i = geti32(sp);
-    seti32(sp, geti32(sp - 1));
-    seti32(sp - 1, i);
+    const i = peek();
+    poke(peek2());
+    poke2(i);
 };
 
 const MOD = () => {
-    updi32(sp - 1, (val) => val % geti32(sp));
-    sp--;
+    const val = pop();
+    poke(peek() % val);
 };
 
 const AND = () => {
-    updi32(sp - 1, (val) => val & geti32(sp));
-    sp--;
+    const val = pop();
+    poke(peek() & val);
 };
 
 const FLOAT = () => {
     ip++;
-    token = geti8(ip);
+    token = getb(ip);
     if (token === CAPOS) {
-        setf32(sp, geti32(sp));
+        pokef(peek());
     } else if (token === CZERO) {
-        seti32(sp, getf32(sp));
+        poke(peekf());
     } else if (token === CDOT) {
-        putStr(getf32(sp).toString());
-        sp--;
+        putStr(popf().toFixed(2));
     } else if (token === CPLUS) {
-        updf32(sp - 1, (val) => val + getf32(sp));
-        sp--;
+        const val = popf();
+        pokef(peekf() + val);
     } else if (token === CMINUS) {
-        updf32(sp - 1, (val) => val - getf32(sp));
-        sp--;
+        const val = popf();
+        pokef(peekf() - val);
     } else if (token === CSTAR) {
-        updf32(sp - 1, (val) => val * getf32(sp));
-        sp--;
+        const val = popf();
+        pokef(peekf() * val);
     } else if (token === CSLASH) {
-        updf32(sp - 1, (val) => val / getf32(sp));
-        sp--;
+        const val = popf();
+        pokef(peekf() / val);
     }
 };
 
 const IF = () => {
-    if (geti32(sp) === FALSE) {
-        sp--;
+    if (pop() === FALSE) {
         ip++;
-        token = geti8(ip);
+        token = getb(ip);
         while (token !== CCPAREN) {
             ip++;
-            token = geti8(ip);
+            token = getb(ip);
         }
-    } else {
-        sp--;
     }
 };
+
 const ADD = () => {
     if (!incMode) {
-        updi32(sp - 1, (val) => val + geti32(sp));
-        sp--;
+        const val = pop();
+        poke(peek() + val);
     } else {
-        updi32(selectedReg, (val) => val + 1);
+        setReg(getReg() + 1);
     }
 };
 
 const EMIT = () => {
-    putch(geti32(sp));
-    sp--;
+    putch(pop());
 };
 
 const NEGATE = () => {
-    updi32(sp, (val) => -val);
+    poke(-peek());
 };
 
 const SUB = () => {
     if (!incMode) {
-        updi32(sp - 1, (val) => val - geti32(sp));
-        sp--;
+        const val = pop();
+        poke(peek() - val);
     } else {
-        updi32(selectedReg, (val) => val - 1);
+        setReg(getReg() - 1);
     }
 };
 
 const DOT = () => {
-    putStr(geti32(sp).toString());
-    sp--;
+    putStr(pop().toString());
 };
 
 const DIV = () => {
-    updi32(sp - 1, (val) => val / geti32(sp));
-    sp--;
+    const val = pop();
+    poke(peek() / val);
 };
 
 const DIGIT = () => {
@@ -167,89 +179,81 @@ const DIGIT = () => {
     while (token >= CZERO && token <= CNINE) {
         i = i * 10 + token - CZERO;
         ip++;
-        token = geti8(ip);
+        token = getb(ip);
     }
-    sp++;
-    seti32(sp, i);
+    push(i);
     ip--;
 };
 
 const RSET = () => {
-    seti32(selectedReg, geti32(sp));
-    sp--;
+    setReg(pop());
 };
 
 const RGET = () => {
-    sp++;
-    seti32(sp, geti32(selectedReg));
+    push(getReg());
 };
 
 const LESS = () => {
-    if (geti32(sp) > geti32(sp - 1)) {
-        seti32(sp, TRUE);
+    if (peek() > peek2()) {
+        poke(TRUE);
     } else {
-        seti32(sp, FALSE);
+        poke(FALSE);
     }
 };
 
 const EQUAL = () => {
-    if (geti32(sp) === geti32(sp - 1)) {
-        seti32(sp, TRUE);
+    if (peek() === peek2()) {
+        poke(TRUE);
     } else {
-        seti32(sp, FALSE);
+        poke(FALSE);
     }
 };
 
 const GREATER = () => {
-    if (geti32(sp) < geti32(sp - 1)) {
-        seti32(sp, TRUE);
+    if (peek() < peek2()) {
+        poke(TRUE);
     } else {
-        seti32(sp, FALSE);
+        poke(FALSE);
     }
 };
 
 const FETCH = () => {
-    sp++;
-    seti32(sp, geti32(geti32(selectedReg)));
+    push(geti(getReg()));
 };
 
 const OVER = () => {
-    seti32(sp + 1, geti32(sp - 1));
-    sp++;
+    push(peek2());
 };
 
 const CALL = () => {
-    rp++;
-    seti32(rp, ip);
-    ip = geti32(token);
-    token = geti8(ip);
+    rpush(ip);
+    ip = geti(token);
+    token = getb(ip);
     ip--;
 };
 
 const LOOP = () => {
-    rp++;
-    seti32(rp, ip);
-    if (geti32(sp) === FALSE) {
+    rpush(ip);
+    if (peek() === FALSE) {
         ip++;
-        token = geti8(ip);
+        token = getb(ip);
         while (token !== CCBRACK) {
             ip++;
-            token = geti8(ip);
+            token = getb(ip);
         }
     }
 };
 
 const DROP = () => {
-    sp--;
+    pop();
 };
 
 const ENDLOOP = () => {
-    if (geti32(sp) !== FALSE) {
-        ip = geti32(rp);
+    if (pop() !== FALSE) {
+        ip = geti(rp);
     } else {
-        rp--;
+        rpop();
     }
-    sp--;
 };
 
 const KEY = () => {
@@ -258,40 +262,38 @@ const KEY = () => {
     if (ch === EOF) {
         ch = 0;
     }
-    sp++;
-    seti32(sp, ch);
+    push(ch);
 };
 
 const EXTERNAL = () => {
     ip++;
-    while (geti8(ip) !== CTICK) {
-        ex += String.fromCharCode(geti8(ip));
+    while (getb(ip) !== CTICK) {
+        ex += String.fromCharCode(getb(ip));
         ip++;
     }
     console.log(ex);
 };
 
 const DEF = () => {
-    const defCode = geti8(ip + 1);
-    seti32(defCode, ip + 2);
-    while (token !== CCBRACE) {
+    const defCode = getb(ip + 1);
+    seti(defCode, ip + 2);
+    while (token !== CCBRACK) {
         ip++;
-        token = geti8(ip);
+        token = getb(ip);
     }
 };
 
 const OR = () => {
-    updi32(sp - 1, (val) => val | geti32(sp));
-    sp--;
+    const val = pop();
+    poke(peek() | val);
 };
 
 const ENDDEF = () => {
-    ip = geti32(rp);
-    rp--;
+    ip = rpop();
 };
 
 const NOT = () => {
-    updi32(sp, (val) => ~val);
+    poke(~peek());
 };
 
 // prettier-ignore
@@ -312,22 +314,19 @@ const q = [
 ];
 
 export const getPrompt = (): string => {
-    // console.log({sp, x: geti32(sp)});
     let s = '';
     for (let i = 0; i < 4; i++) {
-        s += `${geti32(sp - 3 + i)} `;
-        // console.log({i, x: geti32(sp - 3 + i)});
+        s += `${geti(sp - 3 + i)} `;
     }
     return `${s}>`;
 };
 
 export const interpReset = (): void => {
     for (let i = START_DATA; i < DATA_SIZE; i++) {
-        seti8(i, 0);
+        setb(i, 0);
     }
     here = START_PROG;
-    sp = 140;
-    rp = 20;
+    setStacks(140, 20);
     run = true;
 };
 
@@ -335,7 +334,7 @@ const interpTick = (restart?: boolean): boolean => {
     let restarting = restart;
     while (run && ip < here) {
         if (restarting) ip--;
-        token = geti8(ip);
+        token = getb(ip);
         console.log(token);
         const result = Boolean(q[token]());
         if (token < CLOWERA) {
@@ -356,9 +355,9 @@ export const interpret = async (text: string): Promise<void> => {
     for (const char of text) {
         const code = char.codePointAt(0);
         if (code === COBRACE) restore = true;
-        seti8(here++, code!);
+        setb(here++, code!);
     }
-    seti8(here++, NULL);
+    setb(here++, NULL);
     ip = oldHere;
     await new Promise<void>((resolve) => {
         (function loop(restart = false) {

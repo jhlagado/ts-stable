@@ -53,32 +53,20 @@ export const defSpace = (size: number, info: string): Ptr => {
     return result;
 };
 
-export const geti8 = (offset: number): number => mem.getInt8(offset);
-
-export const seti8 = (offset: number, value: number): void => {
-    mem.setInt8(offset, value);
-};
-
-export const updi8 = (offset: number, func: (oldValue: number) => number): void => {
-    seti8(offset, func(geti8(offset)));
-};
-
-export const geti32 = (offset: number): number => mem.getInt32(offset * CELL);
-
-export const seti32 = (offset: number, value: number): void => {
+// int32 (int) operations
+export const geti = (offset: number): number => mem.getInt32(offset * CELL);
+export const seti = (offset: number, value: number): void => {
     mem.setInt32(offset * CELL, value);
 };
 
-export const updi32 = (offset: number, func: (oldValue: number) => number): void => {
-    seti32(offset, func(geti32(offset)));
+// int8 (byte) operations
+export const getb = (offset: number): number => mem.getInt8(offset);
+export const setb = (offset: number, value: number): void => {
+    mem.setInt8(offset, value);
 };
 
-export const getf32 = (offset: number): number => mem.getFloat32(offset * CELL);
-
-export const setf32 = (offset: number, value: number): void => {
+// float32 (float) operations
+export const getf = (offset: number): number => mem.getFloat32(offset * CELL);
+export const setf = (offset: number, value: number): void => {
     mem.setFloat32(offset * CELL, value);
-};
-
-export const updf32 = (offset: number, func: (oldValue: number) => number): void => {
-    setf32(offset, func(getf32(offset)));
 };
