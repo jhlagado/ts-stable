@@ -1,20 +1,15 @@
-/* eslint-disable no-control-regex */
-/* eslint-disable quotes */
-/* eslint-disable no-unused-vars */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 // prettier-ignore
 import {
-    CAPOS, CCBRACK, CCPAREN, CDOT, CLOWERA, CLOWERZ, 
-    CMINUS, CNINE, COBRACE, CCBRACE, CPLUS, CQUOTE, 
-    CSLASH, CSTAR, CTICK, CZERO, DATA_SIZE, FALSE, 
-    NULL, START_DATA, START_PROG, TRUE,
+    CAPOS, CCBRACK, CCPAREN, CLOWERA, CLOWERZ, 
+    CNINE, COBRACE, CCBRACE, CQUOTE, 
+    CTICK, CZERO, DATA_SIZE, FALSE, 
+    NULL, START_DATA, START_PROG, TRUE, TCELL, CDOT,
 } from './constants';
 
 import { getch, getquery, putch, putStr } from './io';
-import { geti, getb, seti, setb, TypeDef, lastType, binaryType, secondLastType } from './memory';
+import { getb, setb, CellType, lastType, binaryType, secondLastType, tget, tset } from './memory';
 import { getReg, selectReg, setReg } from './registers';
-import { setStacks, trpeek, trpop, trpush, tpoke, tpeek, tpop, tpush, tpeek2, tpoke2 } from './stacks';
+import { setStacks, rpeek, rpop, rpush, poke, peek, pop, push, peek2, poke2 } from './stacks';
 
 let ip = 0;
 
@@ -30,24 +25,24 @@ let incMode = false;
 
 const ADD = () => {
     if (!incMode) {
-        const y = tpop();
-        const x = tpeek();
-        tpoke(x + y, binaryType);
+        const y = pop();
+        const x = peek();
+        poke(x + y, binaryType);
     } else {
-        setReg(getReg() + 1);
+        setReg(getReg() + 1, lastType);
     }
 };
 
 const AND = () => {
-    const val = tpop();
-    tpoke(tpeek() & val);
+    const val = pop();
+    poke(peek() & val, CellType.int);
 };
 
 const CALL = () => {
-    trpush(ip);
-    ip = geti(token);
+    rpush(ip, CellType.int);
+    ip = tget(token * TCELL);
     if (ip === 0) {
-        ip = trpop();
+        ip = rpop();
         return;
     }
     token = getb(ip);
@@ -56,7 +51,7 @@ const CALL = () => {
 
 const DEF = () => {
     const defCode = getb(ip + 1);
-    seti(defCode, ip + 2);
+    tset(defCode * TCELL, ip + 2, CellType.int);
     while (token !== CCBRACE) {
         ip++;
         token = getb(ip);
@@ -64,57 +59,60 @@ const DEF = () => {
 };
 
 const DIV = () => {
-    const y = tpop();
-    const x = tpeek();
-    tpoke(x / y, binaryType);
+    const y = pop();
+    const x = peek();
+    poke(x / y, binaryType);
 };
 
 const DOT = () => {
-    const val = tpop();
-    putStr(lastType === TypeDef.float ? val.toFixed(2) : val.toString());
+    const val = pop();
+    putStr(lastType === CellType.float ? val.toFixed(2) : val.toString());
 };
 
 const DROP = () => {
-    tpop();
+    pop();
 };
 
 const DUP = () => {
-    const val = tpeek();
-    tpush(val, lastType);
+    const val = peek();
+    push(val, lastType);
 };
 
 const DIGIT = () => {
-    let i = 0;
-    while (token >= CZERO && token <= CNINE) {
-        i = i * 10 + token - CZERO;
+    let s = '';
+    let cellType = CellType.int;
+    while (token === CDOT || (token >= CZERO && token <= CNINE)) {
+        if (token === CDOT) cellType = CellType.float;
+        s += String.fromCharCode(token);
         ip++;
         token = getb(ip);
     }
-    tpush(i);
+    const i = Number(s);
+    push(i, cellType);
     ip--;
 };
 
 const EMIT = () => {
-    putch(tpop());
+    putch(pop());
 };
 
 const ENDDEF = () => {
-    ip = trpop();
+    ip = rpop();
 };
 
 const ENDLOOP = () => {
-    if (tpop() !== FALSE) {
-        ip = trpeek();
+    if (pop() !== FALSE) {
+        ip = rpeek();
     } else {
-        trpop();
+        rpop();
     }
 };
 
 const EQUAL = () => {
-    if (tpeek() === tpeek2()) {
-        tpoke(TRUE);
+    if (peek() === peek2()) {
+        poke(TRUE, CellType.int);
     } else {
-        tpoke(FALSE);
+        poke(FALSE, CellType.int);
     }
 };
 
@@ -128,29 +126,29 @@ const EXTERNAL = () => {
 };
 
 const FETCH = () => {
-    tpush(geti(getReg()));
+    push(tget(getReg() * TCELL), lastType);
 };
 
 const FLOAT = () => {
     ip++;
     token = getb(ip);
     if (token === CAPOS) {
-        tpoke(tpeek(), TypeDef.float);
+        poke(peek(), CellType.float);
     } else if (token === CZERO) {
-        tpoke(tpeek());
+        poke(peek(), CellType.int);
     }
 };
 
 const GREATER = () => {
-    if (tpeek() < tpeek2()) {
-        tpoke(TRUE);
+    if (peek() < peek2()) {
+        poke(TRUE, CellType.int);
     } else {
-        tpoke(FALSE);
+        poke(FALSE, CellType.int);
     }
 };
 
 const IF = () => {
-    if (tpop() === FALSE) {
+    if (pop() === FALSE) {
         ip++;
         token = getb(ip);
         while (token !== CCPAREN) {
@@ -166,20 +164,20 @@ const KEY = () => {
     if (ch === EOF) {
         ch = 0;
     }
-    tpush(ch);
+    push(ch, CellType.int);
 };
 
 const LESS = () => {
-    if (tpeek() > tpeek2()) {
-        tpoke(TRUE);
+    if (peek() > peek2()) {
+        poke(TRUE, CellType.int);
     } else {
-        tpoke(FALSE);
+        poke(FALSE, CellType.int);
     }
 };
 
 const LOOP = () => {
-    trpush(ip);
-    if (tpeek() === FALSE) {
+    rpush(ip, CellType.int);
+    if (peek() === FALSE) {
         ip++;
         token = getb(ip);
         while (token !== CCBRACK) {
@@ -190,33 +188,33 @@ const LOOP = () => {
 };
 
 const MOD = () => {
-    const val = tpop();
-    tpoke(tpeek() % val);
+    const val = pop();
+    poke(peek() % val, CellType.int);
 };
 
 const MUL = () => {
-    const y = tpop();
-    const x = tpeek();
-    tpoke(x * y, binaryType);
+    const y = pop();
+    const x = peek();
+    poke(x * y, binaryType);
 };
 
 const NEGATE = () => {
-    tpoke(-tpeek(), lastType);
+    poke(-peek(), lastType);
 };
 
 const NOP = () => {};
 
 const NOT = () => {
-    tpoke(~tpeek());
+    poke(~peek(), lastType);
 };
 
 const OR = () => {
-    const val = tpop();
-    tpoke(tpeek() | val);
+    const val = pop();
+    poke(peek() | val, CellType.int);
 };
 
 const OVER = () => {
-    tpush(tpeek2(), lastType);
+    push(peek2(), lastType);
 };
 
 const PRINT = () => {
@@ -235,31 +233,31 @@ const REG = () => {
 };
 
 const RSET = () => {
-    setReg(tpop());
+    setReg(pop(), lastType);
 };
 
 const RGET = () => {
-    tpush(getReg());
+    push(getReg(), lastType);
 };
 
 const SUB = () => {
     if (!incMode) {
-        const y = tpop();
-        const x = tpeek();
-        tpoke(x - y, binaryType);
+        const y = pop();
+        const x = peek();
+        poke(x - y, binaryType);
     } else {
-        setReg(getReg() - 1);
+        setReg(getReg() - 1, lastType);
     }
 };
 
 const STORE = () => {
-    seti(getReg(), tpop());
+    tset(getReg(), pop(), lastType);
 };
 
 const SWAP = () => {
-    const i = tpeek();
-    tpoke(tpeek2(), lastType);
-    tpoke2(i, secondLastType);
+    const i = peek();
+    poke(peek2(), lastType);
+    poke2(i, secondLastType);
 };
 
 // prettier-ignore

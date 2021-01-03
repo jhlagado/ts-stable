@@ -53,11 +53,11 @@ export const defSpace = (size: number, info: string): Ptr => {
     return result;
 };
 
-// int32 (int) operations
-export const geti = (offset: number): number => mem.getInt32(offset * CELL);
-export const seti = (offset: number, value: number): void => {
-    mem.setInt32(offset * CELL, value);
-};
+// // int32 (int) operations
+// export const geti = (offset: number): number => mem.getInt32(offset * CELL);
+// export const seti = (offset: number, value: number): void => {
+//     mem.setInt32(offset * CELL, value);
+// };
 
 // int8 (byte) operations
 export const getb = (offset: number): number => mem.getInt8(offset);
@@ -65,33 +65,33 @@ export const setb = (offset: number, value: number): void => {
     mem.setInt8(offset, value);
 };
 
-// float32 (float) operations
-export const getf = (offset: number): number => mem.getFloat32(offset * CELL);
-export const setf = (offset: number, value: number): void => {
-    mem.setFloat32(offset * CELL, value);
-};
+// // float32 (float) operations
+// export const getf = (offset: number): number => mem.getFloat32(offset * CELL);
+// export const setf = (offset: number, value: number): void => {
+//     mem.setFloat32(offset * CELL, value);
+// };
 
 // eslint-disable-next-line no-shadow
-export enum TypeDef {
+export enum CellType {
     int,
     float,
 }
-export let lastType: TypeDef = TypeDef.int;
-export let secondLastType: TypeDef = TypeDef.int;
-export let binaryType: TypeDef = TypeDef.int;
+export let lastType: CellType = CellType.int;
+export let secondLastType: CellType = CellType.int;
+export let binaryType: CellType = CellType.int;
 
 export const tget = (offset: number): number => {
     secondLastType = lastType;
     lastType = mem.getInt8(offset);
     binaryType = secondLastType | lastType;
-    if (lastType === TypeDef.float) return mem.getFloat32(offset + 1);
+    if (lastType === CellType.float) return mem.getFloat32(offset + 1);
     return mem.getInt32(offset + 1);
 };
-export const tset = (offset: number, value: number, typeDef: TypeDef): void => {
+export const tset = (offset: number, value: number, typeDef: CellType): void => {
     secondLastType = lastType;
     lastType = typeDef;
     binaryType = secondLastType | lastType;
     mem.setInt8(offset, typeDef);
-    if (typeDef === TypeDef.float) return mem.setFloat32(offset + 1, value);
+    if (typeDef === CellType.float) return mem.setFloat32(offset + 1, value);
     return mem.setInt32(offset + 1, value);
 };
