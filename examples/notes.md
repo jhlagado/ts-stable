@@ -1,3 +1,5 @@
+'xyz\x1B[31mxyz'.replace(/\u001b\[(\d{2})m/, (a,b) => `---${b}----`)
+
 calmin2
 
 ```

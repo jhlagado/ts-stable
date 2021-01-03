@@ -27,3 +27,13 @@ export const rpop = (): number => geti(rp--);
 export const rpush = (value: number): void => seti(++rp, value);
 export const rpeek = (): number => geti(rp);
 export const rpoke = (value: number): void => seti(rp, value);
+
+
+// const lastType = 0;
+
+// export const tpop = (): number => {geti(sp--);lastType=getb(sp);}
+// export const tpush = (value: number): void => seti(++sp, value);
+// export const tpeek = (): number => geti(sp);
+// export const tpoke = (value: number): void => seti(sp, value);
+// export const tpeek2 = (): number => geti(sp - 1);
+// export const tpoke2 = (value: number): void => seti(sp - 1, value);

@@ -1,3 +1,4 @@
+/* eslint-disable no-control-regex */
 /* eslint-disable quotes */
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
@@ -25,8 +26,6 @@ import {
     START_DATA,
     START_PROG,
     TRUE,
-    CUPPERZ,
-    CUPPERA,
 } from './constants';
 import { getch, getquery, putch, putStr } from './io';
 import { geti, getb, seti, setb } from './memory';
@@ -232,6 +231,10 @@ const OVER = () => {
 const CALL = () => {
     rpush(ip);
     ip = geti(token);
+    if (ip === 0) {
+        ip = rpop();
+        return;
+    }
     token = getb(ip);
     ip--;
 };
@@ -329,7 +332,7 @@ export const interpReset = (): void => {
     for (let i = START_DATA; i < DATA_SIZE; i++) {
         setb(i, 0);
     }
-    setb(0, CCBRACE); // dummy procedure with just } i.e. ENDDEF
+    // setb(0, CCBRACE); // dummy procedure with just } i.e. ENDDEF
     here = START_PROG;
     oldHere = here;
     setStacks(140, 20);
@@ -373,6 +376,6 @@ export const interpret = async (text: string): Promise<void> => {
     if (!save) {
         here = oldHere;
     }
-    oldHere = here; 
-    console.log({oldHere, here, ip});
+    oldHere = here;
 };
+
