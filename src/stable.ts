@@ -3,30 +3,14 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+// prettier-ignore
 import {
-    CAPOS,
-    CCBRACK,
-    CCPAREN,
-    CDOT,
-    CLOWERA,
-    CLOWERZ,
-    CMINUS,
-    CNINE,
-    COBRACE,
-    CCBRACE,
-    CPLUS,
-    CQUOTE,
-    CSLASH,
-    CSTAR,
-    CTICK,
-    CZERO,
-    DATA_SIZE,
-    FALSE,
-    NULL,
-    START_DATA,
-    START_PROG,
-    TRUE,
+    CAPOS, CCBRACK, CCPAREN, CDOT, CLOWERA, CLOWERZ, 
+    CMINUS, CNINE, COBRACE, CCBRACE, CPLUS, CQUOTE, 
+    CSLASH, CSTAR, CTICK, CZERO, DATA_SIZE, FALSE, 
+    NULL, START_DATA, START_PROG, TRUE,
 } from './constants';
+
 import { getch, getquery, putch, putStr } from './io';
 import { geti, getb, seti, setb, TypeDef } from './memory';
 import { getReg, selectReg, setReg } from './registers';
