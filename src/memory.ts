@@ -70,3 +70,22 @@ export const getf = (offset: number): number => mem.getFloat32(offset * CELL);
 export const setf = (offset: number, value: number): void => {
     mem.setFloat32(offset * CELL, value);
 };
+
+// eslint-disable-next-line no-shadow
+export enum TypeDef {
+    int,
+    float,
+}
+export let lastType: TypeDef = TypeDef.int;
+
+export const tget = (offset: number): number => {
+    lastType = mem.getInt8(offset);
+    if (lastType === TypeDef.float) return mem.getFloat32(offset + 1);
+    return mem.getInt32(offset + 1);
+};
+export const tset = (offset: number, value: number, typeDef: TypeDef): void => {
+    lastType = typeDef;
+    mem.setInt8(offset, typeDef);
+    if (typeDef === TypeDef.float) return mem.setFloat32(offset + 1, value);
+    return mem.setInt32(offset + 1, value);
+};

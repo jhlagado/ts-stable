@@ -28,26 +28,9 @@ import {
     TRUE,
 } from './constants';
 import { getch, getquery, putch, putStr } from './io';
-import { geti, getb, seti, setb } from './memory';
+import { geti, getb, seti, setb, TypeDef } from './memory';
 import { getReg, selectReg, setReg } from './registers';
-import {
-    pop,
-    push,
-    peek2,
-    poke2,
-    peek,
-    poke,
-    pokef,
-    peekf,
-    popf,
-    pokef2,
-    peekf2,
-    sp,
-    rp,
-    rpush,
-    rpop,
-    setStacks,
-} from './stacks';
+import { setStacks, trpeek, trpop, trpush, tpoke, tpeek, tpop, tpush, tpeek2, tpoke2 } from './stacks';
 
 let ip = 0;
 
@@ -61,15 +44,204 @@ let ex = '';
 let token = 0;
 let incMode = false;
 
-const NOP = () => {};
-
-const STORE = () => {
-    seti(getReg(), pop());
+const ADD = () => {
+    if (!incMode) {
+        const val = tpop();
+        tpoke(tpeek() + val);
+    } else {
+        setReg(getReg() + 1);
+    }
 };
 
-const REG = () => {
-    incMode = true;
-    selectReg(token);
+const AND = () => {
+    const val = tpop();
+    tpoke(tpeek() & val);
+};
+
+const CALL = () => {
+    trpush(ip);
+    ip = geti(token);
+    if (ip === 0) {
+        ip = trpop();
+        return;
+    }
+    token = getb(ip);
+    ip--;
+};
+
+const DEF = () => {
+    const defCode = getb(ip + 1);
+    seti(defCode, ip + 2);
+    while (token !== CCBRACE) {
+        ip++;
+        token = getb(ip);
+    }
+};
+
+const DIV = () => {
+    const val = tpop();
+    tpoke(tpeek() / val);
+};
+
+const DOT = () => {
+    putStr(tpop().toString());
+};
+
+const DROP = () => {
+    tpop();
+};
+
+const DUP = () => {
+    tpush(tpeek());
+};
+
+const DIGIT = () => {
+    let i = 0;
+    while (token >= CZERO && token <= CNINE) {
+        i = i * 10 + token - CZERO;
+        ip++;
+        token = getb(ip);
+    }
+    tpush(i);
+    ip--;
+};
+
+const EMIT = () => {
+    putch(tpop());
+};
+
+const ENDDEF = () => {
+    ip = trpop();
+};
+
+const ENDLOOP = () => {
+    if (tpop() !== FALSE) {
+        ip = trpeek();
+    } else {
+        trpop();
+    }
+};
+
+const EQUAL = () => {
+    if (tpeek() === tpeek2()) {
+        tpoke(TRUE);
+    } else {
+        tpoke(FALSE);
+    }
+};
+
+const EXTERNAL = () => {
+    ip++;
+    while (getb(ip) !== CTICK) {
+        ex += String.fromCharCode(getb(ip));
+        ip++;
+    }
+    console.log(ex);
+};
+
+const FETCH = () => {
+    tpush(geti(getReg()));
+};
+
+const FLOAT = () => {
+    ip++;
+    token = getb(ip);
+    if (token === CAPOS) {
+        tpoke(tpeek(), TypeDef.float);
+    } else if (token === CZERO) {
+        tpoke(tpeek());
+    } else if (token === CDOT) {
+        putStr(tpop().toFixed(2));
+    } else if (token === CPLUS) {
+        const val = tpop();
+        tpoke(tpeek() + val, TypeDef.float);
+    } else if (token === CMINUS) {
+        const val = tpop();
+        tpoke(tpeek() - val, TypeDef.float);
+    } else if (token === CSTAR) {
+        const val = tpop();
+        tpoke(tpeek() * val, TypeDef.float);
+    } else if (token === CSLASH) {
+        const val = tpop();
+        tpoke(tpeek() / val, TypeDef.float);
+    }
+};
+
+const GREATER = () => {
+    if (tpeek() < tpeek2()) {
+        tpoke(TRUE);
+    } else {
+        tpoke(FALSE);
+    }
+};
+
+const IF = () => {
+    if (tpop() === FALSE) {
+        ip++;
+        token = getb(ip);
+        while (token !== CCPAREN) {
+            ip++;
+            token = getb(ip);
+        }
+    }
+};
+
+const KEY = () => {
+    if (!getquery()) return true;
+    let ch = getch();
+    if (ch === EOF) {
+        ch = 0;
+    }
+    tpush(ch);
+};
+
+const LESS = () => {
+    if (tpeek() > tpeek2()) {
+        tpoke(TRUE);
+    } else {
+        tpoke(FALSE);
+    }
+};
+
+const LOOP = () => {
+    trpush(ip);
+    if (tpeek() === FALSE) {
+        ip++;
+        token = getb(ip);
+        while (token !== CCBRACK) {
+            ip++;
+            token = getb(ip);
+        }
+    }
+};
+
+const MOD = () => {
+    const val = tpop();
+    tpoke(tpeek() % val);
+};
+
+const MUL = () => {
+    const val = tpop();
+    tpoke(tpeek() * val);
+};
+
+const NEGATE = () => {
+    tpoke(-tpeek());
+};
+
+const NOP = () => {};
+
+const NOT = () => {
+    tpoke(~tpeek());
+};
+
+const OR = () => {
+    const val = tpop();
+    tpoke(tpeek() | val);
+};
+
+const OVER = () => {
+    tpush(tpeek2());
 };
 
 const PRINT = () => {
@@ -82,225 +254,36 @@ const PRINT = () => {
     }
 };
 
-const DUP = () => {
-    push(peek());
+const REG = () => {
+    incMode = true;
+    selectReg(token);
 };
 
-const MUL = () => {
-    const val = pop();
-    poke(peek() * val);
+const RSET = () => {
+    setReg(tpop());
 };
 
-const SWAP = () => {
-    const i = peek();
-    poke(peek2());
-    poke2(i);
-};
-
-const MOD = () => {
-    const val = pop();
-    poke(peek() % val);
-};
-
-const AND = () => {
-    const val = pop();
-    poke(peek() & val);
-};
-
-const FLOAT = () => {
-    ip++;
-    token = getb(ip);
-    if (token === CAPOS) {
-        pokef(peek());
-    } else if (token === CZERO) {
-        poke(peekf());
-    } else if (token === CDOT) {
-        putStr(popf().toFixed(2));
-    } else if (token === CPLUS) {
-        const val = popf();
-        pokef(peekf() + val);
-    } else if (token === CMINUS) {
-        const val = popf();
-        pokef(peekf() - val);
-    } else if (token === CSTAR) {
-        const val = popf();
-        pokef(peekf() * val);
-    } else if (token === CSLASH) {
-        const val = popf();
-        pokef(peekf() / val);
-    }
-};
-
-const IF = () => {
-    if (pop() === FALSE) {
-        ip++;
-        token = getb(ip);
-        while (token !== CCPAREN) {
-            ip++;
-            token = getb(ip);
-        }
-    }
-};
-
-const ADD = () => {
-    if (!incMode) {
-        const val = pop();
-        poke(peek() + val);
-    } else {
-        setReg(getReg() + 1);
-    }
-};
-
-const EMIT = () => {
-    putch(pop());
-};
-
-const NEGATE = () => {
-    poke(-peek());
+const RGET = () => {
+    tpush(getReg());
 };
 
 const SUB = () => {
     if (!incMode) {
-        const val = pop();
-        poke(peek() - val);
+        const val = tpop();
+        tpoke(tpeek() - val);
     } else {
         setReg(getReg() - 1);
     }
 };
 
-const DOT = () => {
-    putStr(pop().toString());
+const STORE = () => {
+    seti(getReg(), tpop());
 };
 
-const DIV = () => {
-    const val = pop();
-    poke(peek() / val);
-};
-
-const DIGIT = () => {
-    let i = 0;
-    while (token >= CZERO && token <= CNINE) {
-        i = i * 10 + token - CZERO;
-        ip++;
-        token = getb(ip);
-    }
-    push(i);
-    ip--;
-};
-
-const RSET = () => {
-    setReg(pop());
-};
-
-const RGET = () => {
-    push(getReg());
-};
-
-const LESS = () => {
-    if (peek() > peek2()) {
-        poke(TRUE);
-    } else {
-        poke(FALSE);
-    }
-};
-
-const EQUAL = () => {
-    if (peek() === peek2()) {
-        poke(TRUE);
-    } else {
-        poke(FALSE);
-    }
-};
-
-const GREATER = () => {
-    if (peek() < peek2()) {
-        poke(TRUE);
-    } else {
-        poke(FALSE);
-    }
-};
-
-const FETCH = () => {
-    push(geti(getReg()));
-};
-
-const OVER = () => {
-    push(peek2());
-};
-
-const CALL = () => {
-    rpush(ip);
-    ip = geti(token);
-    if (ip === 0) {
-        ip = rpop();
-        return;
-    }
-    token = getb(ip);
-    ip--;
-};
-
-const LOOP = () => {
-    rpush(ip);
-    if (peek() === FALSE) {
-        ip++;
-        token = getb(ip);
-        while (token !== CCBRACK) {
-            ip++;
-            token = getb(ip);
-        }
-    }
-};
-
-const DROP = () => {
-    pop();
-};
-
-const ENDLOOP = () => {
-    if (pop() !== FALSE) {
-        ip = geti(rp);
-    } else {
-        rpop();
-    }
-};
-
-const KEY = () => {
-    if (!getquery()) return true;
-    let ch = getch();
-    if (ch === EOF) {
-        ch = 0;
-    }
-    push(ch);
-};
-
-const EXTERNAL = () => {
-    ip++;
-    while (getb(ip) !== CTICK) {
-        ex += String.fromCharCode(getb(ip));
-        ip++;
-    }
-    console.log(ex);
-};
-
-const DEF = () => {
-    const defCode = getb(ip + 1);
-    seti(defCode, ip + 2);
-    while (token !== CCBRACE) {
-        ip++;
-        token = getb(ip);
-    }
-};
-
-const OR = () => {
-    const val = pop();
-    poke(peek() | val);
-};
-
-const ENDDEF = () => {
-    ip = rpop();
-};
-
-const NOT = () => {
-    poke(~peek());
+const SWAP = () => {
+    const i = tpeek();
+    tpoke(tpeek2());
+    tpoke2(i);
 };
 
 // prettier-ignore
@@ -319,14 +302,6 @@ const opcodes = [
     REG, REG, REG, REG, REG, REG, REG, REG, REG, REG, 
     REG, REG, REG, DEF, OR, ENDDEF, NOT, 
 ];
-
-export const getPrompt = (): string => {
-    let s = '';
-    for (let i = 0; i < 4; i++) {
-        s += `${geti(sp - 3 + i)} `;
-    }
-    return `${s}>`;
-};
 
 export const interpReset = (): void => {
     for (let i = START_DATA; i < DATA_SIZE; i++) {
@@ -378,4 +353,3 @@ export const interpret = async (text: string): Promise<void> => {
     }
     oldHere = here;
 };
-
