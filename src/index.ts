@@ -12,6 +12,13 @@ export const log = (message: string): void => {
     screen!.scrollTop = screen!.scrollHeight;
 };
 
+export const log2 = (message: string): void => {
+    const output = document.getElementById('output');
+    output!.innerText += `<div class='log'><p>${message}</p></div>`;
+    const screen = document.getElementById('screen');
+    screen!.scrollTop = screen!.scrollHeight;
+};
+
 const inputSource = document.getElementById('input_source')!;
 inputSource.onblur = () => {
     inputSource.focus();
@@ -36,7 +43,7 @@ inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
         appendInputBuffer(text);
         const oldPrompt = getPrompt();
         await interpret(text);
-        log(`${oldPrompt} ${text}`);
+        log(`${oldPrompt} ${text.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;').replaceAll(/"/g, '&apos;')}`);
         const prompt = document.getElementById('prompt');
         prompt!.innerText = getPrompt();
     }
