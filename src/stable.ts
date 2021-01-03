@@ -12,7 +12,7 @@ import {
 } from './constants';
 
 import { getch, getquery, putch, putStr } from './io';
-import { geti, getb, seti, setb, TypeDef } from './memory';
+import { geti, getb, seti, setb, TypeDef, lastType, binaryType, secondLastType } from './memory';
 import { getReg, selectReg, setReg } from './registers';
 import { setStacks, trpeek, trpop, trpush, tpoke, tpeek, tpop, tpush, tpeek2, tpoke2 } from './stacks';
 
@@ -30,8 +30,9 @@ let incMode = false;
 
 const ADD = () => {
     if (!incMode) {
-        const val = tpop();
-        tpoke(tpeek() + val);
+        const y = tpop();
+        const x = tpeek();
+        tpoke(x + y, binaryType);
     } else {
         setReg(getReg() + 1);
     }
@@ -63,12 +64,14 @@ const DEF = () => {
 };
 
 const DIV = () => {
-    const val = tpop();
-    tpoke(tpeek() / val);
+    const y = tpop();
+    const x = tpeek();
+    tpoke(x / y, binaryType);
 };
 
 const DOT = () => {
-    putStr(tpop().toString());
+    const val = tpop();
+    putStr(lastType === TypeDef.float ? val.toFixed(2) : val.toString());
 };
 
 const DROP = () => {
@@ -76,7 +79,8 @@ const DROP = () => {
 };
 
 const DUP = () => {
-    tpush(tpeek());
+    const val = tpeek();
+    tpush(val, lastType);
 };
 
 const DIGIT = () => {
@@ -134,20 +138,6 @@ const FLOAT = () => {
         tpoke(tpeek(), TypeDef.float);
     } else if (token === CZERO) {
         tpoke(tpeek());
-    } else if (token === CDOT) {
-        putStr(tpop().toFixed(2));
-    } else if (token === CPLUS) {
-        const val = tpop();
-        tpoke(tpeek() + val, TypeDef.float);
-    } else if (token === CMINUS) {
-        const val = tpop();
-        tpoke(tpeek() - val, TypeDef.float);
-    } else if (token === CSTAR) {
-        const val = tpop();
-        tpoke(tpeek() * val, TypeDef.float);
-    } else if (token === CSLASH) {
-        const val = tpop();
-        tpoke(tpeek() / val, TypeDef.float);
     }
 };
 
@@ -205,12 +195,13 @@ const MOD = () => {
 };
 
 const MUL = () => {
-    const val = tpop();
-    tpoke(tpeek() * val);
+    const y = tpop();
+    const x = tpeek();
+    tpoke(x * y, binaryType);
 };
 
 const NEGATE = () => {
-    tpoke(-tpeek());
+    tpoke(-tpeek(), lastType);
 };
 
 const NOP = () => {};
@@ -225,7 +216,7 @@ const OR = () => {
 };
 
 const OVER = () => {
-    tpush(tpeek2());
+    tpush(tpeek2(), lastType);
 };
 
 const PRINT = () => {
@@ -253,8 +244,9 @@ const RGET = () => {
 
 const SUB = () => {
     if (!incMode) {
-        const val = tpop();
-        tpoke(tpeek() - val);
+        const y = tpop();
+        const x = tpeek();
+        tpoke(x - y, binaryType);
     } else {
         setReg(getReg() - 1);
     }
@@ -266,8 +258,8 @@ const STORE = () => {
 
 const SWAP = () => {
     const i = tpeek();
-    tpoke(tpeek2());
-    tpoke2(i);
+    tpoke(tpeek2(), lastType);
+    tpoke2(i, secondLastType);
 };
 
 // prettier-ignore

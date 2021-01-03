@@ -77,14 +77,20 @@ export enum TypeDef {
     float,
 }
 export let lastType: TypeDef = TypeDef.int;
+export let secondLastType: TypeDef = TypeDef.int;
+export let binaryType: TypeDef = TypeDef.int;
 
 export const tget = (offset: number): number => {
+    secondLastType = lastType;
     lastType = mem.getInt8(offset);
+    binaryType = secondLastType | lastType;
     if (lastType === TypeDef.float) return mem.getFloat32(offset + 1);
     return mem.getInt32(offset + 1);
 };
 export const tset = (offset: number, value: number, typeDef: TypeDef): void => {
+    secondLastType = lastType;
     lastType = typeDef;
+    binaryType = secondLastType | lastType;
     mem.setInt8(offset, typeDef);
     if (typeDef === TypeDef.float) return mem.setFloat32(offset + 1, value);
     return mem.setInt32(offset + 1, value);
