@@ -43,7 +43,7 @@ inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
         appendInputBuffer(text);
         const oldPrompt = getPrompt();
         await interpret(text);
-        log(`${oldPrompt} ${text.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;').replaceAll(/"/g, '&apos;')}`);
+        log(`${oldPrompt} ${text.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;').replaceAll(/"/g, '&quote;')}`);
         const prompt = document.getElementById('prompt');
         prompt!.innerText = getPrompt();
     }
