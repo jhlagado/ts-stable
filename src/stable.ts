@@ -25,6 +25,8 @@ import {
     START_DATA,
     START_PROG,
     TRUE,
+    CUPPERZ,
+    CUPPERA,
 } from './constants';
 import { getch, getquery, putch, putStr } from './io';
 import { geti, getb, seti, setb } from './memory';
@@ -327,6 +329,7 @@ export const interpReset = (): void => {
     for (let i = START_DATA; i < DATA_SIZE; i++) {
         setb(i, 0);
     }
+    setb(0, CCBRACE); // dummy procedure with just } i.e. ENDDEF
     here = START_PROG;
     oldHere = here;
     setStacks(140, 20);
@@ -352,10 +355,10 @@ const interpTick = (restart?: boolean): boolean => {
 };
 
 export const interpret = async (text: string): Promise<void> => {
-    let restore = true;
+    let save = false; // save text if it contains a procedure definition
     for (const char of text) {
         const code = char.codePointAt(0);
-        if (code === COBRACE) restore = false;
+        if (code === COBRACE) save = true;
         setb(here++, code!);
     }
     setb(here++, NULL);
@@ -367,9 +370,8 @@ export const interpret = async (text: string): Promise<void> => {
             else resolve();
         })();
     });
-    if (restore) {
+    if (!save) {
         here = oldHere;
-        ip = oldHere;
     }
     oldHere = here; 
     console.log({oldHere, here, ip});

@@ -29,4 +29,6 @@ export const COBRACE = '{'.charCodeAt(0);
 export const CCBRACE = '}'.charCodeAt(0);
 export const CLOWERA = 'a'.charCodeAt(0);
 export const CLOWERZ = 'z'.charCodeAt(0);
+export const CUPPERA = 'a'.charCodeAt(0);
+export const CUPPERZ = 'z'.charCodeAt(0);
 export const CTICK = '`'.charCodeAt(0);
