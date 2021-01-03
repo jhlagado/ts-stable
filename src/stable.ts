@@ -12,6 +12,7 @@ import {
     CMINUS,
     CNINE,
     COBRACE,
+    CCBRACE,
     CPLUS,
     CQUOTE,
     CSLASH,
@@ -51,6 +52,7 @@ let ip = 0;
 
 let run: boolean;
 let here: number;
+let oldHere: number;
 
 const EOF = 5;
 
@@ -277,7 +279,7 @@ const EXTERNAL = () => {
 const DEF = () => {
     const defCode = getb(ip + 1);
     seti(defCode, ip + 2);
-    while (token !== CCBRACK) {
+    while (token !== CCBRACE) {
         ip++;
         token = getb(ip);
     }
@@ -297,7 +299,7 @@ const NOT = () => {
 };
 
 // prettier-ignore
-const q = [ 
+const opcodes = [ 
     NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
     NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, NOP, 
@@ -326,6 +328,7 @@ export const interpReset = (): void => {
         setb(i, 0);
     }
     here = START_PROG;
+    oldHere = here;
     setStacks(140, 20);
     run = true;
 };
@@ -335,8 +338,7 @@ const interpTick = (restart?: boolean): boolean => {
     while (run && ip < here) {
         if (restarting) ip--;
         token = getb(ip);
-        console.log(token);
-        const result = Boolean(q[token]());
+        const result = Boolean(opcodes[token]());
         if (token < CLOWERA) {
             incMode = false;
         } else if (token > CLOWERZ) {
@@ -350,11 +352,10 @@ const interpTick = (restart?: boolean): boolean => {
 };
 
 export const interpret = async (text: string): Promise<void> => {
-    const oldHere = here;
     let restore = true;
     for (const char of text) {
         const code = char.codePointAt(0);
-        if (code === COBRACE) restore = true;
+        if (code === COBRACE) restore = false;
         setb(here++, code!);
     }
     setb(here++, NULL);
@@ -366,5 +367,10 @@ export const interpret = async (text: string): Promise<void> => {
             else resolve();
         })();
     });
-    if (restore) here = oldHere;
+    if (restore) {
+        here = oldHere;
+        ip = oldHere;
+    }
+    oldHere = here; 
+    console.log({oldHere, here, ip});
 };
