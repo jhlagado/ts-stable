@@ -10,6 +10,7 @@ import { getch, getquery, putch, putStr } from './io';
 import { getb, setb, CellType, lastType, binaryType, secondLastType, tget, tset } from './memory';
 import { getReg, selectReg, setReg } from './registers';
 import { setStacks, rpeek, rpop, rpush, poke, peek, pop, push, peek2, poke2 } from './stacks';
+import { formatCell } from './utils';
 
 let ip = 0;
 
@@ -66,7 +67,7 @@ const DIV = () => {
 
 const DOT = () => {
     const val = pop();
-    putStr(lastType === CellType.float ? val.toFixed(2) : val.toString());
+    putStr(formatCell(val,lastType));
 };
 
 const DROP = () => {

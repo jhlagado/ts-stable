@@ -87,11 +87,11 @@ export const tget = (offset: number): number => {
     if (lastType === CellType.float) return mem.getFloat32(offset + 1);
     return mem.getInt32(offset + 1);
 };
-export const tset = (offset: number, value: number, typeDef: CellType): void => {
+export const tset = (offset: number, value: number, cellType: CellType): void => {
     secondLastType = lastType;
-    lastType = typeDef;
+    lastType = cellType;
     binaryType = secondLastType | lastType;
-    mem.setInt8(offset, typeDef);
-    if (typeDef === CellType.float) return mem.setFloat32(offset + 1, value);
+    mem.setInt8(offset, cellType);
+    if (cellType === CellType.float) return mem.setFloat32(offset + 1, value);
     return mem.setInt32(offset + 1, value);
 };

@@ -7,4 +7,4 @@ export const selectReg = (reg: number): void => {
     selectedReg = reg;
 };
 export const getReg = (): number => tget(selectedReg * TCELL);
-export const setReg = (value: number, typeDef: CellType): void => tset(selectedReg * TCELL, value, typeDef);
+export const setReg = (value: number, cellType: CellType): void => tset(selectedReg * TCELL, value, cellType);
