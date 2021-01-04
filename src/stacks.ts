@@ -1,5 +1,6 @@
 import { TCELL } from './constants';
-import { CellType, tget, tset, lastType } from './memory';
+import { tget, tset, lastType } from './memory';
+import { CellType } from './types';
 import { formatCell } from './utils';
 
 export let sp = 0;

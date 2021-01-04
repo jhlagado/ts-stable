@@ -1,5 +1,6 @@
 import { TCELL } from './constants';
-import { tget, tset, CellType } from './memory';
+import { tget, tset } from './memory';
+import { CellType } from './types';
 
 let selectedReg = 0;
 

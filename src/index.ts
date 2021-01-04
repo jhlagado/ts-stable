@@ -1,6 +1,6 @@
 import 'regenerator-runtime/runtime';
 import { appendInputBuffer, outputBuffer, setOutputBuffer } from './io';
-import { interpReset, interpret } from './stable';
+import { interpReset, interpret } from './interpreter';
 import { getStackPrompt } from './stacks';
 
 const history: string[] = [];
@@ -27,7 +27,6 @@ inputSource.onblur = () => {
 
 inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
     event.preventDefault();
-    console.log('key', event.key);
     if (event.key === 'ArrowUp') {
         if (history.length > historyIndex) {
             (inputSource as any).value = history[historyIndex++];
