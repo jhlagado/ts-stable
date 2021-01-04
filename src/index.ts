@@ -2,6 +2,7 @@ import 'regenerator-runtime/runtime';
 import { appendInputBuffer, outputBuffer, setOutputBuffer } from './io';
 import { interpReset, interpret } from './interpreter';
 import { getStackPrompt } from './stacks';
+import { escapeHTML } from './utils';
 
 const history: string[] = [];
 let historyIndex = 0;
@@ -43,7 +44,7 @@ inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
         appendInputBuffer(text);
         const oldPrompt = getStackPrompt();
         await interpret(text);
-        log(`${oldPrompt} ${text.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;').replaceAll(/"/g, '&quot;')}`);
+        log(`${oldPrompt} ${escapeHTML(text)}`);
         const prompt = document.getElementById('prompt');
         prompt!.innerText = getStackPrompt();
     }

@@ -8,3 +8,7 @@ export const formatCell = (value: number, cellType: CellType): string => {
     }
     return value.toString();
 };
+
+export const escapeHTML = (text: string): string => {
+    return text.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;').replaceAll(/"/g, '&quot;');
+};
