@@ -167,14 +167,6 @@ const IF = (): void => {
     }
 };
 
-// const IF = (): void => {
-//     if (pop() === FALSE) {
-//         ip++;
-//         ip = mem.getInt32(ip);
-//         token = getb(ip);
-//     }
-// };
-
 const KEY = (): void | boolean => {
     if (!getquery()) return true;
     let ch = getch();
@@ -203,18 +195,6 @@ const LOOP = (): void => {
         }
     }
 };
-
-// const LOOP = (): void => {
-//     if (peek() === FALSE) {
-//         ip++;
-//         ip = mem.getInt32(ip);
-//         token = getb(ip);
-//     }
-//     else {
-//         rpush(ip, CellType.int);
-//         ip += CELL;
-//     }
-// };
 
 const MOD = (): void => {
     const val = pop();
