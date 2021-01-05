@@ -4,7 +4,6 @@ import { outputBuffer } from './io';
 it('should be true', async () => {
     interpReset();
     interpret('49a: 5b: 89c: 1[b+;75*1023&#b:c;%1+.9,a;5%0=(10,)a-;]b;c%.');
-    // console.log(outputBuffer);
     expect(outputBuffer).toBe(`6\t34\t58\t61\t50\t
 8\t16\t21\t33\t21\t
 46\t20\t44\t73\t15\t
