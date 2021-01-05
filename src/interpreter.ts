@@ -3,6 +3,7 @@ import {
     CLOWERA, CLOWERZ, 
     COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG,
 } from './constants';
+import { setOutputBuffer } from './io';
 
 import { getb, setb } from './memory';
 import { ip, opcodes, setIncMode, setIP, setToken, token } from './opcodes';
@@ -21,6 +22,7 @@ export const interpReset = (): void => {
     oldHere = here;
     setStacks(140, 20);
     run = true;
+    setOutputBuffer('');
 };
 
 const interpTick = (restart?: boolean): boolean => {
