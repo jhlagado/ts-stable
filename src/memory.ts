@@ -1,4 +1,5 @@
 import { MEM_START, MEM_SIZE } from './constants';
+import { putStr } from './io';
 import { CellType, Ptr } from './types';
 
 export const buffer = new ArrayBuffer(MEM_SIZE);
@@ -65,10 +66,15 @@ export const tget = (offset: number): number => {
     return mem.getInt32(offset + 1);
 };
 export const tset = (offset: number, value: number, cellType: CellType): void => {
-    secondLastType = lastType;
-    lastType = cellType;
-    binaryType = secondLastType | lastType;
-    mem.setInt8(offset, cellType);
-    if (cellType === CellType.float) return mem.setFloat32(offset + 1, value);
-    return mem.setInt32(offset + 1, value);
+    try {
+        secondLastType = lastType;
+        lastType = cellType;
+        binaryType = secondLastType | lastType;
+        mem.setInt8(offset, cellType);
+        if (cellType === CellType.float) return mem.setFloat32(offset + 1, value);
+        return mem.setInt32(offset + 1, value);
+    } catch (e) {
+        putStr(`Error: tried to store number ${value} at address ${offset + 1}\n\n`);
+        throw e;
+    }
 };

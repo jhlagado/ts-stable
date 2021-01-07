@@ -72,10 +72,10 @@ export const interpret = async (text: string): Promise<void> => {
             } else {
                 putStr(char);
             }
-            if ((i - START_PROG + 1) % 40 === 0) putStr('\n');
+            if ((i - START_PROG + 1) % 80 === 0) putStr('\n');
         }
         const { ip, sp, rp } = state;
-        putStr(`\n${JSON.stringify({ ip, sp, rp })}\n\n`);
+        putStr(`\n\n${JSON.stringify({ ip, sp, rp })}\n\n`);
         putStr(e.stack.split('\n').slice(0, 4).join('\n'));
     }
 };
