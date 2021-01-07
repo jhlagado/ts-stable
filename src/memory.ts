@@ -59,11 +59,16 @@ export let secondLastType: CellType = CellType.int;
 export let binaryType: CellType = CellType.int;
 
 export const tget = (offset: number): number => {
-    secondLastType = lastType;
-    lastType = mem.getInt8(offset);
-    binaryType = secondLastType | lastType;
-    if (lastType === CellType.float) return mem.getFloat32(offset + 1);
-    return mem.getInt32(offset + 1);
+    try {
+        secondLastType = lastType;
+        lastType = mem.getInt8(offset);
+        binaryType = secondLastType | lastType;
+        if (lastType === CellType.float) return mem.getFloat32(offset + 1);
+        return mem.getInt32(offset + 1);
+    } catch (e) {
+        putStr(`\n\nError: tried to fetch number at address ${offset + 1}\n\n`);
+        throw e;
+    }
 };
 export const tset = (offset: number, value: number, cellType: CellType): void => {
     try {
@@ -74,7 +79,7 @@ export const tset = (offset: number, value: number, cellType: CellType): void =>
         if (cellType === CellType.float) return mem.setFloat32(offset + 1, value);
         return mem.setInt32(offset + 1, value);
     } catch (e) {
-        putStr(`Error: tried to store number ${value} at address ${offset + 1}\n\n`);
+        putStr(`\n\nError: tried to store number ${value} at address ${offset + 1}\n\n`);
         throw e;
     }
 };

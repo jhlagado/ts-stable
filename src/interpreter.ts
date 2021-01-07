@@ -65,8 +65,8 @@ export const interpret = async (text: string): Promise<void> => {
         if (state.rp < 20) state.rp = 20;
         console.log('state', JSON.stringify(state));
     } catch (e) {
-        putStr('\n\n');
-        for (let i = START_PROG; i < Math.min(10000, state.here); i++) {
+        putStr('\n');
+        for (let i = START_PROG; i < Math.min(100000, state.here); i++) {
             const char = String.fromCodePoint(getb(i));
             if (i === state.ip) {
                 putStr(`<span style="color:red">${char}</span>`);

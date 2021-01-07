@@ -12,7 +12,7 @@ export const TRUE = -1;
 export const FALSE = 0;
 
 export const START_DATA = 0;
-export const DATA_SIZE = 8000;
+export const DATA_SIZE = 2000 * TCELL;
 export const START_PROG = START_DATA + DATA_SIZE;
 
 export const CZERO = '0'.charCodeAt(0);
