@@ -244,7 +244,7 @@ const SUB = (): void => {
 };
 
 const STORE = (): void => {
-    tset(getReg(), pop(), lastType);
+    tset(getReg() * TCELL, pop(), lastType);
 };
 
 const SWAP = (): void => {
