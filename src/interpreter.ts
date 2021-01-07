@@ -1,7 +1,7 @@
 // prettier-ignore
 import {
     CLOWERA, CLOWERZ, 
-    COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG, TCELL,
+    COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG, CELL,
 } from './constants';
 import { state } from './globals';
 import { putStr, setOutputBuffer } from './io';
@@ -78,7 +78,7 @@ export const interpret = async (text: string): Promise<void> => {
         putStr(`ip: ${ip} sp: ${sp} rp: ${rp}\n\n`);
         for (let i = CLOWERA; i <= CLOWERZ; i++) {
             const key = String.fromCodePoint(i);
-            const value = tget(i * TCELL);
+            const value = tget(i * CELL);
             putStr(`${key}: ${value}\t`);
             if (i % 4 === 0) putStr('\n');
         }

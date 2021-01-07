@@ -1,6 +1,6 @@
 import { MEM_START, MEM_SIZE } from './constants';
 import { putStr } from './io';
-import { CellType, Ptr } from './types';
+import { Ptr } from './types';
 
 export const buffer = new ArrayBuffer(MEM_SIZE);
 export const mem = new DataView(buffer);
@@ -54,24 +54,11 @@ export const setb = (offset: number, value: number): void => {
     mem.setInt8(offset, value);
 };
 
-export let lastType: CellType = CellType.int;
-export let secondLastType: CellType = CellType.int;
-export let binaryType: CellType = CellType.int;
-
 export const tget = (offset: number): number => {
-    secondLastType = lastType;
-    lastType = mem.getInt8(offset);
-    binaryType = secondLastType | lastType;
-    if (lastType === CellType.float) return mem.getFloat32(offset + 1);
     return mem.getInt32(offset + 1);
 };
-export const tset = (offset: number, value: number, cellType: CellType): void => {
+export const tset = (offset: number, value: number): void => {
     try {
-        secondLastType = lastType;
-        lastType = cellType;
-        binaryType = secondLastType | lastType;
-        mem.setInt8(offset, cellType);
-        if (cellType === CellType.float) return mem.setFloat32(offset + 1, value);
         return mem.setInt32(offset + 1, value);
     } catch (e) {
         putStr(`Error: tried to store number ${value} at address ${offset + 1}\n\n`);

@@ -1,6 +1,5 @@
 /* eslint-disable quotes */
 export const CELL = 4;
-export const TCELL = 1 + 4;
 
 export const MEM_SIZE = 1000000;
 export const MEM_START = 0;
