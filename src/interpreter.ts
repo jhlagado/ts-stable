@@ -1,12 +1,12 @@
 // prettier-ignore
 import {
     CLOWERA, CLOWERZ, 
-    COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG,
+    COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG, TCELL,
 } from './constants';
 import { state } from './globals';
 import { putStr, setOutputBuffer } from './io';
 
-import { getb, setb } from './memory';
+import { getb, setb, tget } from './memory';
 import { opcodes } from './opcodes';
 
 export const interpReset = (): void => {
@@ -75,7 +75,13 @@ export const interpret = async (text: string): Promise<void> => {
             if ((i - START_PROG + 1) % 80 === 0) putStr('\n');
         }
         const { ip, sp, rp } = state;
-        putStr(`\n\n${JSON.stringify({ ip, sp, rp })}\n\n`);
-        putStr(e.stack.split('\n').slice(0, 4).join('\n'));
+        putStr(`ip: ${ip} sp: ${sp} rp: ${rp}\n\n`);
+        for (let i = CLOWERA; i <= CLOWERZ; i++) {
+            const key = String.fromCodePoint(i);
+            const value = tget(i * TCELL);
+            putStr(`${key}: ${value}\t`);
+            if (i % 4 === 0) putStr('\n');
+        }
+        console.log(e.stack);
     }
 };
