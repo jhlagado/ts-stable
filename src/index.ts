@@ -23,7 +23,7 @@ export const log2 = (message: string): void => {
 
 const inputSource = document.getElementById('input_source')!;
 inputSource.onblur = () => {
-    inputSource.focus();
+    setTimeout(() => inputSource.focus(), 5000); // to allow selecting text put this on a 5 second timer
 };
 
 inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
