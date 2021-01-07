@@ -55,13 +55,18 @@ export const setb = (offset: number, value: number): void => {
 };
 
 export const tget = (offset: number): number => {
-    return mem.getInt32(offset + 1);
+    try {
+        return mem.getInt32(offset + 1);
+    } catch (e) {
+        putStr(`\n\nError: tried to fetch number at address ${offset + 1}\n`);
+        throw e;
+    }
 };
 export const tset = (offset: number, value: number): void => {
     try {
         return mem.setInt32(offset + 1, value);
     } catch (e) {
-        putStr(`Error: tried to store number ${value} at address ${offset + 1}\n\n`);
+        putStr(`\n\nError: tried to store number ${value} at address ${offset + 1}\n`);
         throw e;
     }
 };
