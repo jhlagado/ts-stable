@@ -4,6 +4,7 @@ import {
     CTICK, CZERO, FALSE, 
     TRUE, TCELL, CDOT, CCPAREN, CCBRACK,
 } from './constants';
+import { state } from './globals';
 
 import { getch, getquery, putch, putStr } from './io';
 import { getb, lastType, binaryType, secondLastType, tget, tset } from './memory';
@@ -12,28 +13,11 @@ import { rpeek, rpop, rpush, poke, peek, pop, push, peek2, poke2 } from './stack
 import { CellType } from './types';
 import { formatCell } from './utils';
 
-export let ip = 0;
-export let incMode = false;
-export let token = 0;
-
 const EOF = 5;
-
 let ex = '';
 
-export const setIP = (ip0: number): void => {
-    ip = ip0;
-};
-
-export const setIncMode = (incMode0: boolean): void => {
-    incMode = incMode0;
-};
-
-export const setToken = (token0: number): void => {
-    token = token0;
-};
-
 const ADD = (): void => {
-    if (!incMode) {
+    if (!state.incMode) {
         const y = pop();
         const x = peek();
         poke(x + y, binaryType);
@@ -48,22 +32,22 @@ const AND = (): void => {
 };
 
 const CALL = (): void => {
-    rpush(ip, CellType.int);
-    ip = tget(token * TCELL);
-    if (ip === 0) {
-        ip = rpop();
+    rpush(state.ip, CellType.int);
+    state.ip = tget(state.token * TCELL);
+    if (state.ip === 0) {
+        state.ip = rpop();
         return;
     }
-    token = getb(ip);
-    ip--;
+    state.token = getb(state.ip);
+    state.ip--;
 };
 
 const DEF = (): void => {
-    const defCode = getb(ip + 1);
-    tset(defCode * TCELL, ip + 2, CellType.int);
-    while (token !== CCBRACE) {
-        ip++;
-        token = getb(ip);
+    const defCode = getb(state.ip + 1);
+    tset(defCode * TCELL, state.ip + 2, CellType.int);
+    while (state.token !== CCBRACE) {
+        state.ip++;
+        state.token = getb(state.ip);
     }
 };
 
@@ -90,15 +74,15 @@ const DUP = (): void => {
 const DIGIT = (): void => {
     let s = '';
     let cellType = CellType.int;
-    while (token === CDOT || (token >= CZERO && token <= CNINE)) {
-        if (token === CDOT) cellType = CellType.float;
-        s += String.fromCharCode(token);
-        ip++;
-        token = getb(ip);
+    while (state.token === CDOT || (state.token >= CZERO && state.token <= CNINE)) {
+        if (state.token === CDOT) cellType = CellType.float;
+        s += String.fromCharCode(state.token);
+        state.ip++;
+        state.token = getb(state.ip);
     }
     const i = Number(s);
     push(i, cellType);
-    ip--;
+    state.ip--;
 };
 
 const EMIT = (): void => {
@@ -106,12 +90,12 @@ const EMIT = (): void => {
 };
 
 const ENDDEF = (): void => {
-    ip = rpop();
+    state.ip = rpop();
 };
 
 const ENDLOOP = (): void => {
     if (pop() !== FALSE) {
-        ip = rpeek();
+        state.ip = rpeek();
     } else {
         rpop();
     }
@@ -126,10 +110,10 @@ const EQUAL = (): void => {
 };
 
 const EXTERNAL = (): void => {
-    ip++;
-    while (getb(ip) !== CTICK) {
-        ex += String.fromCharCode(getb(ip));
-        ip++;
+    state.ip++;
+    while (getb(state.ip) !== CTICK) {
+        ex += String.fromCharCode(getb(state.ip));
+        state.ip++;
     }
     console.log(ex);
 };
@@ -139,11 +123,11 @@ const FETCH = (): void => {
 };
 
 const FLOAT = (): void => {
-    ip++;
-    token = getb(ip);
-    if (token === CAPOS) {
+    state.ip++;
+    state.token = getb(state.ip);
+    if (state.token === CAPOS) {
         poke(peek(), CellType.float);
-    } else if (token === CZERO) {
+    } else if (state.token === CZERO) {
         poke(peek(), CellType.int);
     }
 };
@@ -158,11 +142,11 @@ const GREATER = (): void => {
 
 const IF = (): void => {
     if (pop() === FALSE) {
-        ip++;
-        token = getb(ip);
-        while (token !== CCPAREN) {
-            ip++;
-            token = getb(ip);
+        state.ip++;
+        state.token = getb(state.ip);
+        while (state.token !== CCPAREN) {
+            state.ip++;
+            state.token = getb(state.ip);
         }
     }
 };
@@ -185,13 +169,13 @@ const LESS = (): void => {
 };
 
 const LOOP = (): void => {
-    rpush(ip, CellType.int);
+    rpush(state.ip, CellType.int);
     if (peek() === FALSE) {
-        ip++;
-        token = getb(ip);
-        while (token !== CCBRACK) {
-            ip++;
-            token = getb(ip);
+        state.ip++;
+        state.token = getb(state.ip);
+        while (state.token !== CCBRACK) {
+            state.ip++;
+            state.token = getb(state.ip);
         }
     }
 };
@@ -227,18 +211,18 @@ const OVER = (): void => {
 };
 
 const PRINT = (): void => {
-    ip++;
-    token = getb(ip);
-    while (token !== CQUOTE) {
-        putch(token);
-        ip++;
-        token = getb(ip);
+    state.ip++;
+    state.token = getb(state.ip);
+    while (state.token !== CQUOTE) {
+        putch(state.token);
+        state.ip++;
+        state.token = getb(state.ip);
     }
 };
 
 const REG = (): void => {
-    incMode = true;
-    selectReg(token);
+    state.incMode = true;
+    selectReg(state.token);
 };
 
 const RSET = (): void => {
@@ -250,7 +234,7 @@ const RGET = (): void => {
 };
 
 const SUB = (): void => {
-    if (!incMode) {
+    if (!state.incMode) {
         const y = pop();
         const x = peek();
         poke(x - y, binaryType);

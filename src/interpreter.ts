@@ -3,64 +3,79 @@ import {
     CLOWERA, CLOWERZ, 
     COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG,
 } from './constants';
-import { setOutputBuffer } from './io';
+import { state } from './globals';
+import { putStr, setOutputBuffer } from './io';
 
 import { getb, setb } from './memory';
-import { ip, opcodes, setIncMode, setIP, setToken, token } from './opcodes';
-import { setStacks } from './stacks';
-
-
-let run: boolean;
-let here: number;
-let oldHere: number;
+import { opcodes } from './opcodes';
 
 export const interpReset = (): void => {
     for (let i = START_DATA; i < DATA_SIZE; i++) {
         setb(i, 0);
     }
-    here = START_PROG;
-    oldHere = here;
-    setStacks(140, 20);
-    run = true;
     setOutputBuffer('');
+    state.run = true;
+    state.here = START_PROG;
+    state.oldHere = START_PROG;
+    state.sp = 140;
+    state.rp = 20;
+    console.log('state', JSON.stringify(state));
 };
 
 const interpTick = (restart?: boolean): boolean => {
     let restarting = restart;
-    while (run && ip < here) {
-        if (restarting) setIP(ip - 1);
-        setToken(getb(ip));
-        const result = Boolean(opcodes[token]());
-        if (token < CLOWERA) {
-            setIncMode(false);
-        } else if (token > CLOWERZ) {
-            setIncMode(false);
+    while (state.run && state.ip < state.here) {
+        if (restarting) state.ip -= 1;
+        state.token = getb(state.ip);
+        const result = Boolean(opcodes[state.token]());
+        if (state.token < CLOWERA) {
+            state.incMode = false;
+        } else if (state.token > CLOWERZ) {
+            state.incMode = false;
         }
         restarting = false;
-        setIP(ip + 1);
+        state.ip += 1;
         if (result) return true;
     }
     return false;
 };
 
 export const interpret = async (text: string): Promise<void> => {
-    let save = false; // save text if it contains a procedure definition
-    for (const char of text) {
-        const code = char.codePointAt(0);
-        if (code === COBRACE) save = true;
-        setb(here++, code!);
+    try {
+        let save = false; // save text if it contains a procedure definition
+        for (const char of text) {
+            const code = char.codePointAt(0);
+            if (code === COBRACE) save = true;
+            setb(state.here++, code!);
+        }
+        setb(state.here++, NULL);
+        state.ip = state.oldHere;
+        await new Promise<void>((resolve) => {
+            (function loop(restart = false) {
+                const result = interpTick(restart);
+                if (state.run && state.ip < state.here) setTimeout(() => loop(result));
+                else resolve();
+            })();
+        });
+        if (!save) {
+            state.here = state.oldHere;
+        }
+        state.oldHere = state.here;
+        if (state.sp < 140) state.sp = 140;
+        if (state.rp < 20) state.rp = 20;
+        console.log('state', JSON.stringify(state));
+    } catch (e) {
+        for (let i = START_PROG; i < Math.min(10000, state.here); i++) {
+            const char = String.fromCodePoint(getb(i));
+            if (i === state.ip) {
+                putStr(`<span style="color:red">${char}</span>`);
+            } else {
+                putStr(char);
+            }
+            if ((i - START_PROG + 1) % 40 === 0) putStr('\n');
+        }
+        const { ip, sp, rp } = state;
+        putStr(`\n${JSON.stringify({ ip, sp, rp })}\n\n`);
+        putStr(e.stack.split('\n').slice(0, 4).join('\n'));
     }
-    setb(here++, NULL);
-    setIP(oldHere);
-    await new Promise<void>((resolve) => {
-        (function loop(restart = false) {
-            const result = interpTick(restart);
-            if (run && ip < here) setTimeout(() => loop(result));
-            else resolve();
-        })();
-    });
-    if (!save) {
-        here = oldHere;
-    }
-    oldHere = here;
 };

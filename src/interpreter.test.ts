@@ -15,3 +15,12 @@ it('should be true', async () => {
 8\t57\t88\t78\t19\t
 20\t57\t27\t13\t1`);
 });
+
+it('should be true', async () => {
+    interpReset();
+    interpret('{X 1[a; "Line begin " . " Line end." 10, a-; ] } 3a: X');
+    expect(outputBuffer).toBe(`Line begin 3 Line end.
+Line begin 2 Line end.
+Line begin 1 Line end.
+`);
+});
