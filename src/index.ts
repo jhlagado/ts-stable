@@ -60,7 +60,11 @@ const loop = () => {
 loop();
 
 setOutputBuffer('');
-log('STABLE');
+log(
+    `TS-STABLE <a href="https://github.com/jhlagado/ts-stable"
+        target="_blank" 
+        title="An implementation of Sandor Schneider's STABLE language in Typescript by John Hardy ">(?)</a>`,
+);
 interpReset();
 const prompt = document.getElementById('prompt');
 prompt!.innerText = getStackPrompt();

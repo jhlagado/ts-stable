@@ -58,3 +58,11 @@ body {
     outline: 0;
     flex-grow: 1;
 }
+
+a:active,
+a:hover,
+a:visited {
+    color: white;
+    text-decoration: none;
+    outline: none;
+}

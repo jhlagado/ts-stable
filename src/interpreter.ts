@@ -17,8 +17,8 @@ export const interpReset = (): void => {
     state.run = true;
     state.here = START_PROG;
     state.oldHere = START_PROG;
-    state.sp = 140;
-    state.rp = 20;
+    state.sp = 140 * CELL
+    state.rp = 20 * CELL;
     console.log('state', JSON.stringify(state));
 };
 
