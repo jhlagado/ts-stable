@@ -1,7 +1,7 @@
 import { interpReset, interpret } from './interpreter';
 import { outputBuffer, setInputBuffer } from './io';
 
-it('should be true', async () => {
+it('should be mastch code test 1', async () => {
     interpReset();
     setInputBuffer('49a: 5b: 89c: 1[b+;75*1023&#b:c;%1+.9,a;5%0=(10,)a-;]b;c%.');
     await interpret();
@@ -17,7 +17,7 @@ it('should be true', async () => {
 20\t57\t27\t13\t1`);
 });
 
-it('should be true', async () => {
+it('should be mastch code test 2', async () => {
     interpReset();
     setInputBuffer('{X 1[a; "Line begin " . " Line end." 10, a-; ] } 3a: X');
     await interpret();

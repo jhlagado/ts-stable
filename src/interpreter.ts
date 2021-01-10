@@ -19,13 +19,11 @@ export const interpReset = (): void => {
     state.oldHere = START_PROG;
     state.sp = 140 * CELL;
     state.rp = 20 * CELL;
-    console.log('state', JSON.stringify(state));
+    // console.log('state', JSON.stringify(state));
 };
 
 const interpTick = (_restart?: boolean): boolean => {
-    // let restarting = restart;
     while (state.run && state.ip < state.here) {
-        // if (restarting) state.ip -= 1;
         state.token = getb(state.ip);
         const result = Boolean(opcodes[state.token]());
         if (result) return true;
@@ -34,7 +32,6 @@ const interpTick = (_restart?: boolean): boolean => {
         } else if (state.token > CLOWERZ) {
             state.incMode = false;
         }
-        // restarting = false;
         state.ip += 1;
     }
     return false;
@@ -65,7 +62,7 @@ export const interpret = async (): Promise<boolean> => {
         state.oldHere = state.here;
         if (state.sp < 140) state.sp = 140;
         if (state.rp < 20) state.rp = 20;
-        console.log('state', JSON.stringify(state));
+        // console.log('state', JSON.stringify(state));
     } catch (e) {
         putStr('\n');
         for (let i = START_PROG; i < Math.min(10000, state.here); i++) {

@@ -12,6 +12,7 @@
     "^.+\\.tsx?$": "ts-jest"
   },
   "testRegex": "^.*.test.(ts|tsx)$",
+  "collectCoverage": true,
   "collectCoverageFrom": [
     "src/**/*.{ts,tsx}",
     "!src/icons/**/*.{ts,tsx}",
@@ -20,7 +21,8 @@
     "!src/index.tsx"
   ],
   "setupFiles": [
-    "<rootDir>/testSetup.js"
+    "<rootDir>/testSetup.ts",
+    "<rootDir>/mocks/client.ts"
   ],
   "moduleNameMapper": {
     "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/empty.js",
@@ -30,10 +32,10 @@
   "testURL": "https://localhost/",
   "coverageThreshold": {
     "global": {
-      "statements": 0,
-      "branches": 0,
-      "functions": 0,
-      "lines": 0
+      "statements": 1,
+      "branches": 1,
+      "functions": 1,
+      "lines": 1
     }
   }
 }
