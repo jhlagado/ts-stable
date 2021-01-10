@@ -12,7 +12,6 @@ import { getReg, selectReg, setReg } from './registers';
 import { rpeek, rpop, rpush, poke, peek, pop, push, peek2, poke2 } from './stacks';
 import { formatFloat } from './utils';
 
-const EOF = 5;
 let ex = '';
 
 const ADD = (): void => {
@@ -163,12 +162,13 @@ const IF = (): void => {
 };
 
 const KEY = (): void | boolean => {
-    if (!getquery()) return true;
-    let ch = getch();
-    if (ch === EOF) {
-        ch = 0;
+    try {
+        if (!getquery()) return true;
+        push(getch());
+    } catch (e) {
+        putStr('\n\nError: failed to get a key\n');
+        throw e;
     }
-    push(ch);
 };
 
 const LESS = (): void => {

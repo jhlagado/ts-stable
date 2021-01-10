@@ -1,9 +1,10 @@
 import { interpReset, interpret } from './interpreter';
-import { outputBuffer } from './io';
+import { outputBuffer, setInputBuffer } from './io';
 
 it('should be true', async () => {
     interpReset();
-    interpret('49a: 5b: 89c: 1[b+;75*1023&#b:c;%1+.9,a;5%0=(10,)a-;]b;c%.');
+    setInputBuffer('49a: 5b: 89c: 1[b+;75*1023&#b:c;%1+.9,a;5%0=(10,)a-;]b;c%.');
+    await interpret();
     expect(outputBuffer).toBe(`6\t34\t58\t61\t50\t
 8\t16\t21\t33\t21\t
 46\t20\t44\t73\t15\t
@@ -18,7 +19,8 @@ it('should be true', async () => {
 
 it('should be true', async () => {
     interpReset();
-    interpret('{X 1[a; "Line begin " . " Line end." 10, a-; ] } 3a: X');
+    setInputBuffer('{X 1[a; "Line begin " . " Line end." 10, a-; ] } 3a: X');
+    await interpret();
     expect(outputBuffer).toBe(`Line begin 3 Line end.
 Line begin 2 Line end.
 Line begin 1 Line end.

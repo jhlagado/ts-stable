@@ -4,7 +4,7 @@ import {
     COBRACE, DATA_SIZE, NULL, START_DATA, START_PROG, CELL,
 } from './constants';
 import { state } from './globals';
-import { putStr, setOutputBuffer } from './io';
+import { getch, putStr, setOutputBuffer } from './io';
 
 import { getb, setb, tget } from './memory';
 import { opcodes } from './opcodes';
@@ -17,37 +17,39 @@ export const interpReset = (): void => {
     state.run = true;
     state.here = START_PROG;
     state.oldHere = START_PROG;
-    state.sp = 140 * CELL
+    state.sp = 140 * CELL;
     state.rp = 20 * CELL;
     console.log('state', JSON.stringify(state));
 };
 
-const interpTick = (restart?: boolean): boolean => {
-    let restarting = restart;
+const interpTick = (_restart?: boolean): boolean => {
+    // let restarting = restart;
     while (state.run && state.ip < state.here) {
-        if (restarting) state.ip -= 1;
+        // if (restarting) state.ip -= 1;
         state.token = getb(state.ip);
         const result = Boolean(opcodes[state.token]());
+        if (result) return true;
         if (state.token < CLOWERA) {
             state.incMode = false;
         } else if (state.token > CLOWERZ) {
             state.incMode = false;
         }
-        restarting = false;
+        // restarting = false;
         state.ip += 1;
-        if (result) return true;
     }
     return false;
 };
 
-export const interpret = async (text: string): Promise<void> => {
+export const interpret = async (): Promise<boolean> => {
     try {
         let save = false; // save text if it contains a procedure definition
-        for (const char of text) {
-            const code = char.codePointAt(0);
-            if (code === COBRACE) save = true;
-            setb(state.here++, code!);
-        }
+        let ch = getch();
+        if (ch === NULL) return false;
+        do {
+            if (ch === COBRACE) save = true;
+            setb(state.here++, ch!);
+            ch = getch();
+        } while (ch !== NULL);
         setb(state.here++, NULL);
         state.ip = state.oldHere;
         await new Promise<void>((resolve) => {
@@ -85,4 +87,5 @@ export const interpret = async (text: string): Promise<void> => {
         }
         console.log(e.stack);
     }
+    return true;
 };
