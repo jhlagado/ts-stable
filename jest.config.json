@@ -37,5 +37,13 @@
       "functions": 1,
       "lines": 1
     }
-  }
+  },
+  "coveragePathIgnorePatterns": [
+    "<rootDir>/node_modules"
+  ],
+  "coverageReporters": [
+    "json",
+    "lcov",
+    "text"
+  ]
 }
