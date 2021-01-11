@@ -6,7 +6,7 @@ import {
 } from './constants';
 import { state } from './globals';
 
-import { getch, getquery, putch, putStr } from './io';
+import { echo, getch, getquery, putch, putStr, setUnbuffered } from './io';
 import { getb, tget, tset } from './memory';
 import { getReg, selectReg, setReg } from './registers';
 import { rpeek, rpop, rpush, poke, peek, pop, push, peek2, poke2 } from './stacks';
@@ -163,8 +163,12 @@ const IF = (): void => {
 
 const KEY = (): void | boolean => {
     try {
+        setUnbuffered(true);
         if (!getquery()) return true;
-        push(getch());
+        const ch = getch();
+        setUnbuffered(false);
+        echo(ch);
+        push(ch);
     } catch (e) {
         putStr('\n\nError: failed to get a key\n');
         throw e;

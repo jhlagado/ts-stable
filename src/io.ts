@@ -1,8 +1,9 @@
 import { NULL } from './constants';
+import { escapeHTML } from './utils';
 
 export let inputBuffer = '';
 export let outputBuffer = '';
-export let lastKeyCode = 0;
+export let unbuffered = false;
 
 export const setInputBuffer = (value: string): void => {
     inputBuffer = value;
@@ -33,6 +34,12 @@ export const putStr = (value: string): void => {
     outputBuffer += value;
 };
 
-export const setLastKeyCode = (keyCode:number):void => {
-    lastKeyCode = keyCode;
+export const setUnbuffered = (mode:boolean):void => {
+    unbuffered = mode;
+};
+
+export const echo = (ch:number):void => {
+    if (ch === 0) return;
+    const char = String.fromCharCode(ch);
+    putStr(escapeHTML(char));
 };

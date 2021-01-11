@@ -5,5 +5,5 @@ export const formatFloat = (value: number): string => {
 };
 
 export const escapeHTML = (text: string): string => {
-    return text.replaceAll(/</g, '&lt;').replaceAll(/>/g, '&gt;').replaceAll(/"/g, '&quot;');
+    return text.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 };

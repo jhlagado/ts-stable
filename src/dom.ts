@@ -1,4 +1,4 @@
-import { setLastKeyCode, appendInputBuffer } from './io';
+import { appendInputBuffer, unbuffered } from './io';
 
 const history: string[] = [];
 let historyIndex = 0;
@@ -12,7 +12,6 @@ export const initListeners = (): void => {
     inputSource.addEventListener('keyup', async (event: KeyboardEvent) => {
         event.preventDefault();
         const { key } = event;
-        setLastKeyCode(key.codePointAt(0)!);
         if (key === 'ArrowUp') {
             if (history.length > historyIndex) {
                 (inputSource as any).value = history[historyIndex++];
@@ -21,7 +20,7 @@ export const initListeners = (): void => {
             if (historyIndex > 0) {
                 (inputSource as any).value = history[--historyIndex];
             }
-        } else if (key === 'Enter') {
+        } else if (key === 'Enter' || unbuffered) {
             const text = (inputSource as any).value;
             history.unshift(text);
             historyIndex = 0;

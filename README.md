@@ -1,5 +1,6 @@
-[![Build Status](https://travis-ci.org/jhlagado/ts-stable.svg?branch=master)](https://travis-ci.org/jhlagado/ts-stable)
 # ts-stable
+
+[![Build Status](https://travis-ci.org/jhlagado/ts-stable.svg?branch=master)](https://travis-ci.org/jhlagado/ts-stable)
 
 ## STABLE programming language in Typescript
 
