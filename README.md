@@ -17,9 +17,9 @@ Go here to see [a fully working version of STABLE](https://jhlagado.github.io/ts
 
 | opcode | stack effects | description                 |
 | ------ | ------------- | --------------------------- |
-| -      | (a b -- a+b)  | addition                    |
-| \*     | (a b -- a-b)  | subtraction                 |
-| -      | (a b -- a\*b) | multiply                    |
+| +      | (a b -- a+b)  | addition                    |
+| -      | (a b -- a-b)  | subtraction                 |
+| \*     | (a b -- a\*b) | multiply                    |
 | /      | (a b -- a/b)  | division                    |
 | %      | (a b -- a%b)  | modulo (division remainder) |
 | \_     | (n -- -n)     | negate                      |
